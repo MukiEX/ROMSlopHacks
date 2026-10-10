@@ -1,5 +1,7 @@
 # My Dumb-Ass ROM hacks
 
+This repo contains a variety of poor ROMhack decisions I've made thanks to the power of a cold, unfeeling machine that's willing to enable my stupid delusions.
+
 ## Primal Rage: Arcade Edition on Saturn v.07
 
 ### Latest release file:
@@ -18,10 +20,10 @@ Patch this file:
 
 ### What it does:
 
-Basically imagine a world in which the 4MB RAM cart came to America and Probe Entertainment had it in their hands.
+Basically imagine a world in which the 4MB RAM cart came to America and Probe Entertainment was flush with cash and decided to shoot for the moon with their Saturn port of the game.
 
 The Saturn verison already has "full" animation frames per fighter, but it only uses them in mirror matches.
 
 This patch detects the RAM cart and then loads the full animations for **both fighters** instead.
 
-Has some bugs, works on read hardware.
+Has some bugs, works on real hardware, doubles the loading times. I shouldn't be allowed to make decisions in life.
