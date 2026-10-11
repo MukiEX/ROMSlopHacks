@@ -27,3 +27,30 @@ The Saturn verison already has "full" animation frames per fighter, but it only 
 This patch detects the RAM cart and then loads the full animations for **both fighters** instead.
 
 Has some bugs, works on real hardware, doubles the loading times. I shouldn't be allowed to make decisions in life.
+
+## Puchi Carat: Arcade Translation Edition v1.0
+
+### Latest release file:
+
+```
+Arcade_Puchi_Carat/Puchi Carat Translation Kit.html
+```
+
+The original dialogue script for Puchi Carat was basically shredded for its English language release.
+
+This translation tool:
+
+- Restores the dialogue boxes and prepairs them for translation
+- Allows you to preview the translated text so you can account for placement
+- A sample translation is provided
+- Provides an editable box for every line of dialogue
+- Includes a "Word Wrap" feature and verification that all of the words fit
+- Has symbols for text coloring
+- Has symbols for the game's few emojis
+- Allows characters to be renamed (mostly for the dialogue)
+- Allows you to unlock Patrako permanently
+- Also lets you save a MiSTer .mra for the "PuchiCarat" fork of spacestate1's Taito F3 MiSTer core. 
+
+Some incidental text hasn't been translated. It would require a bit more work, so I may tackle it later.
+
+**The tool does not contain any game data**. The game has to be uploaded into the tool first.
