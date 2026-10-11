@@ -1,0 +1,268 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Primal Rage 4MB Patcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow column, three numbered steps that match the real order of patching (load, pick, save). */
+:root{
+  --bg:#eef0f3; --panel:#ffffff; --fg:#1b1f27; --muted:#5a6272; --line:#d5d9e1;
+  --accent:#c2410c; --accent-fg:#ffffff; --accent-soft:#fde9df;
+  --ok:#1f7a4d; --ok-soft:#e1f3ea; --bad:#b42318; --bad-soft:#fde5e3;
+  --display:"Chakra Petch","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12141a; --panel:#1a1d25; --fg:#e7e9ee; --muted:#9aa2b2; --line:#2c313d;
+  --accent:#f97316; --accent-fg:#1a0d04; --accent-soft:#3a2216;
+  --ok:#4ade80; --ok-soft:#173226; --bad:#f87171; --bad-soft:#3b1a1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12141a; --panel:#1a1d25; --fg:#e7e9ee; --muted:#9aa2b2; --line:#2c313d;
+  --accent:#f97316; --accent-fg:#1a0d04; --accent-soft:#3a2216;
+  --ok:#4ade80; --ok-soft:#173226; --bad:#f87171; --bad-soft:#3b1a1a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--body);padding-inline:16px;padding-block:32px 48px}
+.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font:700 clamp(28px,6vw,40px)/1.05 var(--display);margin:0;text-wrap:balance;letter-spacing:.01em}
+.lede{color:var(--muted);margin:0;max-width:60ch}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.step h2{margin:0;font:600 17px/1.2 var(--display);display:flex;gap:10px;align-items:baseline}
+.step h2 .n{font:500 13px/1 var(--mono);color:var(--muted)}
+.hint{margin:0;color:var(--muted);font-size:14px}
+.drop{border:1.5px dashed var(--line);border-radius:8px;padding:18px;text-align:center;cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.drop strong{font-weight:600}
+.drop span{color:var(--muted);font-size:13px}
+.drop input{position:absolute;width:1px;height:1px;opacity:0}
+.file{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font:13px/1.5 var(--mono);font-variant-numeric:tabular-nums;min-width:0}
+.file dt{color:var(--muted)}
+.file dd{margin:0;overflow-wrap:anywhere;min-width:0}
+.pill{display:inline-block;font:500 12px/1 var(--mono);padding:5px 8px;border-radius:999px;letter-spacing:.02em}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.idle{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:520px){.choices{grid-template-columns:1fr}}
+.choice{border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;gap:10px;cursor:pointer;align-items:flex-start;min-width:0}
+.choice:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.choice input{margin-top:3px;accent-color:var(--accent)}
+.choice b{display:block;font-weight:600}
+.choice small{color:var(--muted);font-size:13px;line-height:1.45;display:block}
+.src{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:14px}
+.src .name{font:13px/1.4 var(--mono);overflow-wrap:anywhere;min-width:0;flex:1 1 200px}
+button{font:600 15px/1 var(--body);border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--fg);padding:11px 16px;cursor:pointer}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.link{padding:6px 10px;font-size:13px;font-weight:500}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg);width:100%;padding:14px 16px;font-size:16px}
+button:disabled{opacity:.45;cursor:not-allowed}
+.bar{height:6px;border-radius:999px;background:var(--bg);border:1px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.status{font-size:14px;margin:0;min-height:1.55em}
+.status.err{color:var(--bad)} .status.good{color:var(--ok)}
+.notes{color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:6px}
+.notes p{margin:0}
+code{font:13px var(--mono)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Sega Saturn · 4MB Extended RAM Cartridge</div>
+    <h1>Primal Rage 4MB Patcher</h1>
+    <p class="lede">Applies the full-animation hack to your <code>Primal Rage (USA) (Track 01).bin</code>. Everything happens in this page; your disc image is never uploaded.</p>
+  </header>
+
+  <section class="step" aria-labelledby="s1">
+    <h2 id="s1"><span class="n">1</span>Load Track 01</h2>
+    <label class="drop" id="binDrop">
+      <input type="file" id="binInput" accept=".bin">
+      <strong>Choose or drop Track 01 (.bin)</strong>
+      <span>Redump image, Mode 1/2352, 129,950,352 bytes</span>
+    </label>
+    <dl class="file" id="binInfo">
+      <dt>File</dt><dd id="binName">none yet</dd>
+      <dt>CRC32</dt><dd id="binCrc">expected 5AFEE626</dd>
+      <dt>Check</dt><dd><span class="pill idle" id="binPill">waiting for file</span></dd>
+    </dl>
+  </section>
+
+  <section class="step" aria-labelledby="s2">
+    <h2 id="s2"><span class="n">2</span>Pick the patch</h2>
+    <div class="src">
+      <span class="name" id="srcName">Built-in: v0.8</span>
+      <label class="drop" style="padding:6px 10px;flex-direction:row;border-style:solid">
+        <input type="file" id="zipInput" accept=".zip,.bps">
+        <span style="color:var(--fg);font-size:13px">Use a release ZIP…</span>
+      </label>
+      <button class="link" id="useBuiltin" hidden>Back to v0.8</button>
+    </div>
+    <div class="choices" role="radiogroup" aria-label="Variant">
+      <label class="choice"><input type="radio" name="variant" id="vDefault" value="default" checked>
+        <span><b>Default</b><small>Reads the cart through the cached address. Start here.</small></span></label>
+      <label class="choice"><input type="radio" name="variant" id="vUncached" value="uncached">
+        <span><b>Uncached cart reads</b><small>Use if player 2's sprites ever show garbage. A little slower.</small></span></label>
+    </div>
+    <dl class="file">
+      <dt>Result</dt><dd id="outCrc">CRC32 6A0B97BF</dd>
+    </dl>
+  </section>
+
+  <section class="step" aria-labelledby="s3">
+    <h2 id="s3"><span class="n">3</span>Patch and save</h2>
+    <button class="primary" id="go" disabled>Patch Track 01</button>
+    <div class="bar" aria-hidden="true"><i id="prog"></i></div>
+    <p class="status" id="status" role="status">Load Track 01 to begin.</p>
+    <div class="notes">
+      <p>You'll get a ZIP holding <code>Primal Rage (USA) (Track 01).bin</code>. Extract it over your original Track 01 and keep your .cue and audio tracks as they are.</p>
+      <p>Enable the 4MB Extended RAM cart in your emulator or core, or insert the real cart. The title screen shows "4MB RAM CART ACTIVE" when it's detected.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+const BPS_DEFAULT="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";
+const BPS_UNCACHED="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";
+
+const $=id=>document.getElementById(id);
+const hex=n=>(n>>>0).toString(16).toUpperCase().padStart(8,"0");
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const T=new Uint32Array(256);for(let i=0;i<256;i++){let c=i;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;T[i]=c>>>0}
+function crc32(u8,crc=0){crc=~crc;for(let i=0;i<u8.length;i++)crc=T[(crc^u8[i])&255]^(crc>>>8);return ~crc>>>0}
+async function crc32Chunked(u8,onp){let c=0;const S=1<<22;for(let i=0;i<u8.length;i+=S){c=crc32(u8.subarray(i,i+S),c);onp&&onp(Math.min(1,(i+S)/u8.length));await new Promise(r=>setTimeout(r))}return c}
+
+function bpsInfo(p){
+  const td=new TextDecoder();
+  if(td.decode(p.subarray(0,4))!=="BPS1")throw new Error("That file isn't a BPS patch.");
+  let pos=4;const rd=()=>{let d=0,s=1;for(;;){const x=p[pos++];d+=(x&127)*s;if(x&128)return d;s*=128;d+=s}};
+  const ss=rd(),ts=rd(),ms=rd();const meta=td.decode(p.subarray(pos,pos+ms));pos+=ms;
+  const dv=new DataView(p.buffer,p.byteOffset,p.byteLength),e=p.length;
+  return {ss,ts,meta,start:pos,srcCrc:dv.getUint32(e-12,true),dstCrc:dv.getUint32(e-8,true),patchCrc:dv.getUint32(e-4,true)};
+}
+function bpsApply(src,p){
+  const I=bpsInfo(p);
+  if(crc32(p.subarray(0,p.length-4))!==I.patchCrc)throw new Error("The patch file is damaged (its own checksum doesn't match).");
+  if(src.length!==I.ss)throw new Error("Track 01 is the wrong size for this patch.");
+  const out=new Uint8Array(I.ts);let pos=I.start,o=0,sr=0,tr=0;const end=p.length-12;
+  const rd=()=>{let d=0,s=1;for(;;){const x=p[pos++];d+=(x&127)*s;if(x&128)return d;s*=128;d+=s}};
+  while(pos<end){const d=rd(),a=d&3;let n=(d>>>2)+1;
+    if(a===0){out.set(src.subarray(o,o+n),o);o+=n}
+    else if(a===1){out.set(p.subarray(pos,pos+n),o);pos+=n;o+=n}
+    else{const v=rd();const off=(v&1?-1:1)*(v>>>1);
+      if(a===2){sr+=off;out.set(src.subarray(sr,sr+n),o);sr+=n;o+=n}
+      else{tr+=off;while(n--)out[o++]=out[tr++]}}}
+  return {out,info:I};
+}
+
+// --- minimal ZIP reader (stored + deflate) and writer
+async function inflateRaw(u8){const s=new Blob([u8]).stream().pipeThrough(new DecompressionStream("deflate-raw"));return new Uint8Array(await new Response(s).arrayBuffer())}
+async function readZip(u8){
+  const dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength);let e=-1;
+  for(let i=u8.length-22;i>=Math.max(0,u8.length-65558);i--)if(dv.getUint32(i,true)===0x06054b50){e=i;break}
+  if(e<0)throw new Error("That file isn't a ZIP archive.");
+  const n=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);const files=[];const td=new TextDecoder();
+  for(let k=0;k<n;k++){const m=dv.getUint16(p+10,true),cs=dv.getUint32(p+20,true),fl=dv.getUint16(p+28,true),xl=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),lo=dv.getUint32(p+42,true);
+    const name=td.decode(u8.subarray(p+46,p+46+fl));p+=46+fl+xl+cl;
+    if(!/\.bps$/i.test(name))continue;
+    const ds=lo+30+dv.getUint16(lo+26,true)+dv.getUint16(lo+28,true);const raw=u8.subarray(ds,ds+cs);
+    files.push({name,data:m===0?raw.slice():await inflateRaw(raw)})}
+  return files;
+}
+async function writeZip(name,data,crc){
+  let body=data,method=0;
+  if(typeof CompressionStream!=="undefined"){try{const s=new Blob([data]).stream().pipeThrough(new CompressionStream("deflate-raw"));body=new Uint8Array(await new Response(s).arrayBuffer());method=8}catch(_){body=data;method=0}}
+  const nm=new TextEncoder().encode(name);const lh=new Uint8Array(30+nm.length),ch=new Uint8Array(46+nm.length),ed=new Uint8Array(22);
+  const L=new DataView(lh.buffer),C=new DataView(ch.buffer),E=new DataView(ed.buffer);
+  const dosTime=0,dosDate=((2026-1980)<<9)|(10<<5)|11;
+  L.setUint32(0,0x04034b50,true);L.setUint16(4,20,true);L.setUint16(6,0x800,true);L.setUint16(8,method,true);L.setUint16(10,dosTime,true);L.setUint16(12,dosDate,true);
+  L.setUint32(14,crc,true);L.setUint32(18,body.length,true);L.setUint32(22,data.length,true);L.setUint16(26,nm.length,true);lh.set(nm,30);
+  C.setUint32(0,0x02014b50,true);C.setUint16(4,20,true);C.setUint16(6,20,true);C.setUint16(8,0x800,true);C.setUint16(10,method,true);C.setUint16(12,dosTime,true);C.setUint16(14,dosDate,true);
+  C.setUint32(16,crc,true);C.setUint32(20,body.length,true);C.setUint32(24,data.length,true);C.setUint16(28,nm.length,true);ch.set(nm,46);
+  E.setUint32(0,0x06054b50,true);E.setUint16(8,1,true);E.setUint16(10,1,true);E.setUint32(12,ch.length,true);E.setUint32(16,lh.length+body.length,true);
+  return new Blob([lh,body,ch,ed],{type:"application/zip"});
+}
+
+// --- state
+const BUILTIN={label:"Built-in: v0.8",default:b64(BPS_DEFAULT),uncached:b64(BPS_UNCACHED)};
+let patches=BUILTIN,src=null,srcOk=false,busy=false;
+const variant=()=>$("vUncached").checked?"uncached":"default";
+function setStatus(t,cls=""){const s=$("status");s.textContent=t;s.className="status "+cls}
+function setProg(f){$("prog").style.width=Math.round(f*100)+"%"}
+function current(){return patches[variant()]||patches.default||patches.uncached}
+function refresh(){
+  $("srcName").textContent=patches.label;
+  $("useBuiltin").hidden=patches===BUILTIN;
+  $("vUncached").disabled=!patches.uncached;$("vDefault").disabled=!patches.default;
+  if(!patches.default)$("vUncached").checked=true;if(!patches.uncached)$("vDefault").checked=true;
+  try{const I=bpsInfo(current());$("outCrc").textContent="CRC32 "+hex(I.dstCrc);$("binCrc").dataset.expect=hex(I.srcCrc);
+    if(!src)$("binCrc").textContent="expected "+hex(I.srcCrc)}catch(e){$("outCrc").textContent=e.message}
+  $("go").disabled=busy||!srcOk;
+}
+
+async function loadBin(file){
+  if(!file)return;busy=true;refresh();
+  $("binName").textContent=file.name+" ("+file.size.toLocaleString()+" bytes)";
+  $("binPill").className="pill idle";$("binPill").textContent="checking…";setStatus("Reading Track 01…");setProg(0);
+  try{
+    src=new Uint8Array(await file.arrayBuffer());
+    const c=await crc32Chunked(src,setProg);const want=bpsInfo(current()).srcCrc;
+    $("binCrc").textContent=hex(c);srcOk=c===want;
+    if(srcOk){$("binPill").className="pill ok";$("binPill").textContent="matches the original";setStatus("Ready. Pick a variant, then patch.","good")}
+    else{$("binPill").className="pill bad";$("binPill").textContent="not the expected image";
+      setStatus("This isn't the unpatched redump Track 01 (expected CRC32 "+hex(want)+"). If it's already patched, start from the original.","err")}
+  }catch(e){src=null;srcOk=false;setStatus("Couldn't read that file: "+e.message,"err")}
+  busy=false;setProg(0);refresh();
+}
+
+async function loadZip(file){
+  if(!file)return;
+  try{
+    const u8=new Uint8Array(await file.arrayBuffer());let found;
+    if(/\.bps$/i.test(file.name))found=[{name:file.name,data:u8}];else found=await readZip(u8);
+    const def=found.find(f=>!/uncached/i.test(f.name)),unc=found.find(f=>/uncached/i.test(f.name));
+    if(!def&&!unc)throw new Error("No .bps patch inside that ZIP.");
+    patches={label:"From "+file.name,default:def&&def.data,uncached:unc&&unc.data};
+    const ok=src?crc32(src)===bpsInfo(current()).srcCrc:false;srcOk=ok;
+    setStatus("Loaded "+found.length+" patch"+(found.length>1?"es":"")+" from "+file.name+".", "good");
+  }catch(e){setStatus(e.message,"err")}
+  refresh();
+}
+
+async function run(){
+  if(!srcOk||busy)return;busy=true;refresh();
+  try{
+    setStatus("Applying patch…");setProg(.1);await new Promise(r=>setTimeout(r,30));
+    const {out,info}=bpsApply(src,current());
+    setStatus("Verifying result…");const c=await crc32Chunked(out,f=>setProg(.1+.4*f));
+    if(c!==info.dstCrc)throw new Error("The patched track's checksum is wrong ("+hex(c)+"). Nothing was saved.");
+    setStatus("Packing ZIP…");setProg(.6);
+    const zip=await writeZip("Primal Rage (USA) (Track 01).bin",out,c);setProg(.95);
+    const tag=(patches===BUILTIN?"v0.8":"patched")+(variant()==="uncached"?" uncached":"");
+    const fname="Primal Rage (USA) (Track 01) [4MB Full Anim "+tag+"].zip";
+    const dl=await (window.claude&&window.claude.use?window.claude.use("downloads"):null);
+    setProg(1);
+    if(!dl){setStatus("Patched and verified (CRC32 "+hex(c)+"), but saving files isn't available in this view. Open the page in the Claude app or claude.ai.","err")}
+    else{
+      setStatus("Patched and verified (CRC32 "+hex(c)+"). Confirm the save…","good");
+      try{await dl.save({filename:fname,data:zip});setStatus("Saved "+fname+". Track CRC32 "+hex(c)+".","good")}
+      catch(e){setStatus(e&&e.code==="declined"?"Save cancelled. Press Patch again when you're ready.":"Couldn't save the file ("+(e&&e.code||e)+").","err")}
+    }
+  }catch(e){setStatus(e.message,"err")}
+  busy=false;setTimeout(()=>setProg(0),800);refresh();
+}
+
+$("binInput").addEventListener("change",e=>loadBin(e.target.files[0]));
+$("zipInput").addEventListener("change",e=>{loadZip(e.target.files[0]);e.target.value=""});
+$("useBuiltin").addEventListener("click",()=>{patches=BUILTIN;srcOk=src?crc32(src)===bpsInfo(current()).srcCrc:false;setStatus("Using the built-in v0.8 patch.");refresh()});
+document.querySelectorAll('input[name=variant]').forEach(r=>r.addEventListener("change",refresh));
+$("go").addEventListener("click",run);
+const drop=$("binDrop");
+["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("over")}));
+["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("over")}));
+drop.addEventListener("drop",e=>loadBin(e.dataTransfer.files[0]));
+refresh();
+</script>
+
+</body></html>
