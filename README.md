@@ -54,3 +54,23 @@ This translation tool:
 Some incidental text hasn't been translated. It would require a bit more work, so I may tackle it later.
 
 **The tool does not contain any game data**. The game has to be uploaded into the tool first.
+
+## Lords of Lunar (Hidden Mini-Game in Lunar: Silver Star Story Complete on PSX in the "Making of" Disc)
+
+### Latest release file:
+
+```
+PSX_Lords_of_Lunar/LordsOfLunar_PaddlePatcher.html
+```
+
+This tool:
+
+- Adds Namco NeGcon/Volume Controller support
+- Adds PlayStation Mouse support
+- Lets you shorten unlock code to just pressing start
+- Allows you to export a 2MB image of __just__ the game
+- Has an option for mouse speed (I use 3X) and mouse menu movement
+
+Effectively, Lords of Lunar is the neatest 9-player paddle game inspired by Atari's Warlords that I've never seen playable since.
+
+I was a bit annoyed that it didn't have "proper" paddle controls for the PlayStation Mouse or NeGcon when the game itself obviously detected these controller types.

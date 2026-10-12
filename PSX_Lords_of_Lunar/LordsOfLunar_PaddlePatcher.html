@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lords of Lunar Paddle Patcher</title>
+<style>
+:root{
+  --bg:#0f1220; --panel:#171b2e; --line:#2a3050; --text:#e7e9f3; --muted:#9aa1bf;
+  --accent:#f2c14e; --accent2:#6fb7ff; --ok:#5fd38d; --bad:#ff6b6b;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f3f1ea; --panel:#ffffff; --line:#d9d4c5; --text:#1d2033; --muted:#5d6280;
+    --accent:#b07d00; --accent2:#1f6fd1; --ok:#1d8a4b; --bad:#c62828;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:720px;margin:0 auto;padding:32px 16px 48px}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:.3px}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);margin:0 0 24px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px}
+.panel h2{font-size:13px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin:0 0 12px}
+ul{margin:0;padding-left:20px} li{margin:4px 0}
+code{font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:color-mix(in srgb,var(--line) 55%,transparent);padding:1px 5px;border-radius:4px}
+#drop{border:2px dashed var(--line);border-radius:12px;padding:36px 16px;text-align:center;cursor:pointer;transition:.15s}
+#drop.hover{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+#drop strong{display:block;font-size:17px;margin-bottom:4px}
+#drop small{color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.opt{display:flex;gap:10px;align-items:flex-start;margin-top:14px;cursor:pointer}
+.opt input{margin-top:4px;accent-color:var(--accent);flex:none}
+.opt b{display:block;font-weight:600}
+.opt small{color:var(--muted)}
+.opt.disabled{opacity:.45}
+fieldset{border:0;margin:14px 0 0;padding:0}
+legend{color:var(--muted);padding:0;margin-bottom:2px}
+label{color:var(--text)}
+.lbl{color:var(--muted)}
+select,button{font:inherit;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text);padding:8px 12px}
+button.primary{background:var(--accent);border-color:var(--accent);color:#1b1500;font-weight:600;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button[hidden]{display:none}
+#log{font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;margin:0;min-height:3em}
+.ok{color:var(--ok)} .bad{color:var(--bad)} .info{color:var(--accent2)}
+footer{color:var(--muted);font-size:13px;margin-top:24px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Lords of <span>Lunar</span> — Paddle Patcher</h1>
+  <p class="sub">For the Lunar: Silver Star Story Complete “Making of” disc (USA, <code>SLUS_009.21</code>). Adds PlayStation Mouse and NeGcon paddle control to the hidden game.</p>
+
+  <section class="panel">
+    <h2>What it does</h2>
+    <ul>
+      <li><b>PS Mouse</b> — horizontal movement slides the paddle around your castle like a spinner. Left click = <code>✕</code> (hold ball / confirm), right click = <code>START</code> in play (pause) and <code>△</code> (back) in menus. In menus it works as a dial: moving left/right steps through characters, and through castle spots left-to-right, row by row.</li>
+      <li><b>NeGcon</b> — the twist sets the paddle’s position directly across the castle’s open sides. Button I = <code>✕</code>, II = <code>□</code>.</li>
+      <li>Digital and analog pads are unchanged. Works through a multitap.</li>
+      <li><b>Restart</b> — hold <code>L1</code>+<code>R1</code>+<code>L2</code>+<code>R2</code>+<code>START</code>+<code>SELECT</code> on any pad to return to the title screen.</li>
+    </ul>
+  </section>
+
+  <section class="panel">
+    <h2>1 · Options</h2>
+    <div class="row">
+      <label class="lbl" for="gain">Mouse speed</label>
+      <select id="gain">
+        <option value="4">0.5×</option>
+        <option value="6">0.75×</option>
+        <option value="8" selected>1× (default)</option>
+        <option value="12">1.5×</option>
+        <option value="16">2×</option>
+        <option value="24">3×</option>
+      </select>
+      <label class="lbl" for="dial" style="margin-left:8px">Menu dial step</label>
+      <select id="dial">
+        <option value="8">Fine</option>
+        <option value="16" selected>Normal (default)</option>
+        <option value="24">Coarse</option>
+        <option value="32">Very coarse</option>
+      </select>
+    </div>
+    <fieldset>
+      <legend>Output</legend>
+      <label class="opt"><input type="radio" name="mode" value="full" checked>
+        <span><b>Full disc</b><small>The whole “Making of” disc with the patch applied.</small></span></label>
+      <label class="opt"><input type="radio" name="mode" value="game">
+        <span><b>Lords of Lunar only</b><small>A small standalone disc image (about 2 MB) that boots straight into the game — no video, no code needed. Saves as .bin + .cue (or .iso for ISO input).</small></span></label>
+    </fieldset>
+    <label class="opt" id="startOpt"><input type="checkbox" id="startOnly" checked>
+      <span><b>Press START to unlock</b><small>On the full disc, pressing START during the video opens the game — no need to enter ↑ ↓ ← → △ START.</small></span></label>
+  </section>
+
+  <section class="panel">
+    <h2>2 · Disc image</h2>
+    <div id="drop" tabindex="0" role="button" aria-label="Choose disc image">
+      <strong>Drop your .bin / .iso here</strong>
+      <small>or click to choose · raw 2352-byte BIN (track 1) or 2048-byte ISO · from a CHD, run <code>chdman extractcd</code> first</small>
+    </div>
+    <input id="file" type="file" accept=".bin,.iso,.img" hidden>
+  </section>
+
+  <section class="panel">
+    <h2>3 · Result</h2>
+    <pre id="log">Waiting for a disc image…</pre>
+    <div class="row" style="margin-top:14px">
+      <button id="dl" class="primary" disabled>Download patched image</button>
+      <button id="dlcue" class="primary" hidden>Download .cue</button>
+    </div>
+  </section>
+
+  <footer>Everything runs locally in your browser — nothing is uploaded. Changing an option after dropping a file re-runs the patch. If your dump uses a .cue with several track files, patch the Track 1 .bin and point the .cue at the new file name (or rename it back).</footer>
+</main>
+
+<script>
+/*@@CORE_BEGIN*/
+const LunarPatcher = (() => {
+  const EXE_NAME = 'SLUS_009.21';
+  const EXE_SIZE = 1204224;
+  const EXE_SECTORS = Math.ceil(EXE_SIZE / 2048);
+  const CRC_ORIG = 0x21f12be5;
+  const GAIN_OFF = 0x121088;
+  const DIAL_OFF = 0x1148d4;
+  const REGIONS = [[1125512, "d8ffbd271800b0af2180a0001c00b1af218880002000bfaf0000048602000586848a040c00000000040022ae04000496000002960200059621208200ffff84240024040006000296032404002128a200ffffa524002c0500aa8a040c032c0500080022ae080004860a000586d08a040c000000000c0022ae1700049216000592140006967c8a040c000000000c000426d78a040c100022ae140022ae00e6023c180022ae18000292000000004b0040100700082400000296000000001000a2a702000296000000001200a2a704000496000000001400a4a706000296000000001600a2a700140400031c02000b006004211000001380023cd036428400000000ffff42242a1043001380033cd036639402004014ffff6224211080001600a3871600a4970c0060041400a2a71380023cd236428400000000ffff42242a1043001380033cd236639404004014ffff6224b989040821108000211000008030080001000825803808000100082580280800010008251600a2a71000a297080003962130d100231043001000a2a71200a2970a0003960060043c231043001200a2a71b0002921a00039200140200001a0300251864001900049225104300251044000000c2ac1000a28f2138f1000000e2ac1400a28f2128b1000000a2acffff0225030022a22000bf8f1c00b18f1800b08f0800e0032800bd27"], [1131912, "e0ffbd271000b0af218080001400b1af2188a0001180043c54d884241800bfafe985040c21280002707c040cffff04241380033ce037638cf00042241380013c083822ac1380013c0c3820ac0000628cc18f04080001033c298f040c000000001d004014ffff02241380023ce037428c000000000000428c0001033c24104300f5ff4014000000001380023cd437428c000000000000428c0004033c24104300edff4010000000001280053ca042a5240c7d040c020004241380023cc436428c212000022000428c0000000009f8400021282002211000001800bf8f1400b18f1000b08f0800e0032000bd27e0ffbd271000b0af218080001400b1af2188a0001180043c78d784241800bfafe985040c21280002707c040cffff04241380033ce037638cf00042241380013c083822ac1380013c0c3820ac0000628cfc8f04080001033c298f040c000000001d004014ffff02241380023ce037428c000000000000428c0001033c24104300f5ff4014000000001380023cd437428c000000000000428c0004033c24104300edff4010000000001280053ca042a5240c7d040c020004241380023cc436428c212000021c00428c0000000009f8400021282002211000001800bf8f1400b18f1000b08f0800e0032000bd27e0ffbd271000b0af218080001800b2af2190a0001400b1af2188c0001180043c84d784241c00bfafe985040c21280002707c040cffff04241380033ce037638cf00042241380013c083822ac1380013c0c3820ac0000628c399004080001033c298f040c0000000030004014ffff02241380023ce037428c000000000000428c0001033c24104300f5ff4014000000001380023cd437428c000000000000428c0004033c24104300edff4010000000001280053ca042a5240c7d040c02000424040002860000000018004010ffff02240600028600000000030040140014110063900408ffff0224ffff4332251043000000058e1380033cc436638c1380043c6c378424040082ac000085ac0400028e00000000080082ac1800628c0000000009f84000f8ff8424211000001c00bf8f1800b28f1400b18f1000b08f0800e0032000bd271380023cce364290e8ffbd271000b0af218080000200422c080040141400bfaf1180043cc0d784241380023cc836428c0000000009f8400021280002707c040cffff04241380033ce037638cf00042241380013c083822ac1380013c0c3820ac0000628c8d9004080001033c298f040c000000001d004014ffff02241380023ce037428c000000000000428c0001033c24104300f5ff4014000000001380023cd437428c000000000000428c0004033c24104300edff4010000000001280053ca042a5240c7d040c020004241380023cc436428c000000001800428c0000000009f8400021200002211000001400bf8f1000b08f0800e0031800bd27"], [1183640, "e8ffbd271000b0af21808000002604000326040009000224090082101400bfaf0a00022410008214ff000232d8c1040c0d0004241380013c4dc204089c5120acd8c1040c200004241380023c9c51428c0000000007004230240040100000000036c20408000000001380013c210822000d512280000000009700423007004010000000001380023c9c51428c00000000010042241380013c9c5122ac1380063ca051c68c000000002000c22807004014000000001c80053ca813a52470c2040c010004241380013ca05120ac1380023ca051428c1c80013c21082200a81330a0010042241380013ca05122ac1380063ca051c68c000000000700c018000000001c80053ca813a52470c2040c010004241380013ca05120ac1400bf8f1000b08f0800e0031800bd27"]];                 // original bytes of every area any version of this patch uses
+  const RUNS = [[1046856, "8c004014", "05900408"], [1104952, "00004292", "1e900408"], [1125512, "d8ffbd271800b0af2180a0001c00b1af218880002000bfaf0000048602000586848a040c00000000040022ae04000496000002960200059621208200ffff84240024040006000296032404002128a200ffffa524002c0500aa8a040c032c0500080022ae080004860a000586d08a040c000000000c0022ae1700049216000592140006967c8a040c000000000c000426d78a040c100022ae140022ae00e6023c180022ae18000292000000004b0040100700082400000296000000001000a2a702000296000000001200a2a704000496000000001400a4a706000296000000001600a2a700140400031c02000b006004211000001380023cd036428400000000ffff42242a1043001380033cd036639402004014ffff6224211080001600a3871600a4970c0060041400a2a71380023cd236428400000000ffff42242a1043001380033cd236639404004014ffff6224b9890408211080002110000080300800", "010088901200092405000911230009240e000911000000000800e003251800000300889025100000080009310200201504000931400042340200201500000000000842340800e0030100032402008890030089900042080027100901ffff423005008890060089906000082d020000156000292d400042340200201500000000800042340800e003010003241380083c9053082500490400214009014400099501000a24460009a52748200124482501480009a5440005a54e000aa508008a8f00000000255049010800e00308008aaf010088900200899003008a9080000b240d000b11090029310b0020150f004a310900401511800b3cf0e26b352b40ab000700001511800b3c60f06b352b40ab0003000011000000000800e003000000001380083ce053082508000924000000a5ffff2925fdff201510000825240080a3260080a320801d3cd8ffbd27010010241380113c1380123cd739040864001324"], [1131912, "e0ffbd271000b0af218080001400b1af2188a0001180043c54d884241800bfafe985040c21280002707c040cffff04241380033ce037638cf00042241380013c083822ac1380013c0c3820ac0000628cc18f04080001033c298f040c000000001d004014ffff02241380023ce037428c000000000000428c0001033c24104300f5ff4014000000001380023cd437428c000000000000428c0004033c24104300edff4010000000001280053ca042a5240c7d040c020004241380023cc436428c212000022000428c0000000009f8400021282002211000001800bf8f1400b18f1000b08f0800e0032000bd27e0ffbd271000b0af218080001400b1af2188a0001180043c78d784241800bfafe985040c21280002707c040cffff04241380033ce037638cf00042241380013c083822ac1380013c0c3820ac0000628cfc8f04080001033c298f040c000000001d004014ffff02241380023ce037428c000000000000428c0001033c24104300f5ff4014000000001380023cd437428c000000000000428c0004033c24104300edff4010000000001280053ca042a5240c7d040c020004241380023cc436428c212000021c00428c0000000009f8400021282002211000001800bf8f1400b18f1000b08f0800e0032000bd27e0ffbd271000b0af218080001800b2af2190a0001400b1af2188c0001180043c84d784241c00bfafe985040c21280002707c040cffff04241380033ce037638cf00042241380013c083822ac1380013c0c3820ac0000628c399004080001033c298f040c0000000030004014ffff02241380023ce037428c000000000000428c0001033c24104300f5ff4014000000001380023cd437428c000000000000428c0004033c24104300edff4010000000001280053ca042a5240c7d040c02000424040002860000000018004010ffff02240600028600000000030040140014110063900408ffff0224ffff4332251043000000058e1380033cc436638c1380043c6c378424040082ac000085ac0400028e00000000080082ac1800628c0000000009f84000f8ff8424211000001c00bf8f1800b28f1400b18f1000b08f0800e0032000bd271380023cce364290e8ffbd271000b0af218080000200422c080040141400bfaf1180043cc0d784241380023cc836428c0000000009f8400021280002707c040cffff04241380033ce037638cf00042241380013c083822ac1380013c0c3820ac0000628c8d9004080001033c298f040c000000001d004014ffff02241380023ce037428c000000000000428c0001033c24104300f5ff401400000000", "620588846405898494058a8c2558000102000105256020012358080002002105000000002360090002004a91256800018000a2290200401481ffa2297f000d24020040102570200181ff0d248000c2290200401481ffc2297f000e24020040102a106c0181ff0e24080040140000000003000005000000000a0000107d01cf25790302240700001023784e000300210500000000030000107f00af257b02022423784d001380183c21c00a0300191993f41802930c190393e81806932bc819002b1002002b1803002b3006004010020080180300c030060025c8220325c8230325c82603f80307247b02062421002013010003242518000025c00000061019030100423006004014030006270300c6300610d900010042300800401400000000010018270400022bf4ff4014000000007b0206240f0000100100032400321800401018002330c200253800002510000306405900010008310600001500000000fe00e72401004224f803e828f8ff0015030042302a10e6010200401003004b2df803ef2526c204080000000016004014000000001c00a58f9689040c252020026289040c252020020d00601025304000010028921200092405000915252040024b90040c2528200225304000252040028589040c2528c000203d040801000224943c0408000000001f3d040800000000000042920000000028004014252800009689040c252040026289040c252040022000601025984000252080028589040c25286002010016241800001200000000010022920000000014004014000000000800828f0000000025105300080082af40006232030040140000000006000010660500a25c008293000000000200401001000224660502a225200002a28f040c252840029177040800000000ab77040825100000527504084100022490770408000000000400a8801280093cd84129254050040021482a0100002b8513800c3c0051040021608a01d4538c952158680112800d3cd441ad8500a08c310b0080152a506d010400401523700d000020c6340600001023586d012a50cb0103004015000000000080c63421586d01ffffaa252a704b010200c01123700a00255840012a786e010200e011000000002558c00100002ba50008c83002000011000000001008c6380800e0032510c0001000000000000000000000000000000000000000fe00e22904004010fc01e22981ffe8250e00001081ff092404004010fa02e2297f0008240900001083fee925040040107b02082423400f01040000107f00092481ff08247903092423482f01620588a40800e003640589a4"], [1183640, "e8ffbd271000b0af21808000002604000326040009000224090082101400bfaf0a00022410008214ff000232d8c1040c0d0004241380013c4dc204089c5120acd8c1040c200004241380023c9c51428c0000000007004230240040100000000036c20408000000001380013c210822000d512280000000009700423007004010000000001380023c9c51428c00000000010042241380013c9c5122ac1380063ca051c68c000000002000c22807004014000000001c80053ca813a52470c2040c010004241380013ca05120ac1380023ca051428c1c80013c21082200a81330a0010042241380013ca05122ac1380063ca051c68c", "03006014000000000100c624feffe7240100a2902300082412004814000000000400a8900000000019000701ff000924124000000000000000000000020020151b0009010d000700124000001240000002006011000000002340e8001a0000102178c8000400a8801380093c880929850200601100000000234008001800090112400000c34008000f0060142178e8012a10e601030040102148c7000a0000102578c0002a102f01070040102310e901f803c82423400f012a400201020000152578c000257820010300e105f803e229fdff0010f803ef250300401400000000f9ff001008fcef257a9004080000000008000000"]];                       // [offset, original hex, patched hex]
+  const TABLE = { off: 0x122020, orig: '0010000000400000', start: '0008000000000000' };   // unlock code table
+  const SKIP  = { off: 0x0fee48, orig: 'bc78040c', game: '02000224' };                    // jal movie -> li $v0,2
+  const GAME_NAME = 'Lords of Lunar';
+
+  const hex = (h) => Uint8Array.from(h.match(/../g), (x) => parseInt(x, 16));
+  const put = (u8, off, h) => u8.set(hex(h), off);
+
+  // ---- CRC32
+  const CRC_T = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) { let c = i; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; CRC_T[i] = c >>> 0; }
+  function crc32(u8) { let c = 0xffffffff; for (let i = 0; i < u8.length; i++) c = CRC_T[(c ^ u8[i]) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; }
+
+  // ---- CD-ROM EDC / ECC
+  const EDC_T = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) { let e = i; for (let k = 0; k < 8; k++) e = (e >>> 1) ^ (e & 1 ? 0xD8018001 : 0); EDC_T[i] = e >>> 0; }
+  function edc(u8, start, end) { let e = 0; for (let i = start; i < end; i++) e = (EDC_T[(e ^ u8[i]) & 0xff] ^ (e >>> 8)) >>> 0; return e; }
+  const F = new Uint8Array(256), B = new Uint8Array(256);
+  for (let i = 0; i < 256; i++) F[i] = ((i << 1) ^ (i & 0x80 ? 0x11d : 0)) & 0xff;
+  for (let i = 0; i < 256; i++) B[i ^ F[i]] = i;
+  function eccBlock(sec, majorCount, minorCount, majorMult, minorInc, destOff) {
+    const size = majorCount * minorCount;
+    for (let major = 0; major < majorCount; major++) {
+      let index = (major >> 1) * majorMult + (major & 1), a = 0, b = 0;
+      for (let minor = 0; minor < minorCount; minor++) {
+        const t = sec[12 + index];
+        index += minorInc; if (index >= size) index -= size;
+        a ^= t; b ^= t; a = F[a];
+      }
+      a = B[F[a] ^ b];
+      sec[destOff + major] = a; sec[destOff + major + majorCount] = a ^ b;
+    }
+  }
+  function setEdc(sec, at, v) { sec[at] = v; sec[at + 1] = v >>> 8; sec[at + 2] = v >>> 16; sec[at + 3] = v >>> 24; }
+  function fixSector(sec) {                       // sec: Uint8Array(2352)
+    const mode = sec[15];
+    if (mode === 1) {
+      setEdc(sec, 2064, edc(sec, 0, 2064));
+      eccBlock(sec, 86, 24, 2, 86, 2076); eccBlock(sec, 52, 43, 86, 88, 2248);
+    } else if (mode === 2) {
+      if (sec[18] & 0x20) {                       // form 2: EDC only (optional), no ECC
+        setEdc(sec, 2348, edc(sec, 16, 2348));
+        return;
+      }
+      setEdc(sec, 2072, edc(sec, 16, 2072));
+      const hdr = sec.slice(12, 16); sec.fill(0, 12, 16);
+      eccBlock(sec, 86, 24, 2, 86, 2076); eccBlock(sec, 52, 43, 86, 88, 2248);
+      sec.set(hdr, 12);
+    }
+  }
+  const bcd = (n) => ((n / 10) | 0) * 16 + (n % 10);
+  function setMsf(sec, lba) { const x = lba + 150; sec[12] = bcd((x / 4500) | 0); sec[13] = bcd(((x / 75) | 0) % 60); sec[14] = bcd(x % 75); }
+  const SYNC = [0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0];
+
+  function revert(exe) {                          // undo any previous version of this patch
+    for (const [off, o] of REGIONS) put(exe, off, o);
+    for (const [off, o] of RUNS) put(exe, off, o);
+    put(exe, TABLE.off, TABLE.orig);
+    put(exe, SKIP.off, SKIP.orig);
+  }
+  function apply(exe, opt, standalone) {
+    for (const [off, , n] of RUNS) put(exe, off, n);
+    exe[GAIN_OFF] = opt.gain & 0xff; exe[GAIN_OFF + 1] = (opt.gain >> 8) & 0xff;
+    const dial = opt.dial || 16;
+    exe[DIAL_OFF] = dial & 0xff; exe[DIAL_OFF + 1] = (dial >> 8) & 0xff;
+    if (opt.startOnly && !standalone) put(exe, TABLE.off, TABLE.start);
+    if (standalone) put(exe, SKIP.off, SKIP.game);
+  }
+
+  // read: async (offset, length) => Uint8Array
+  // opt: { gain, startOnly, mode: 'full' | 'game' }
+  // returns { kind:'writes', writes } or { kind:'image', bytes, ext, cue }
+  async function patch(read, fileSize, opt, log = () => {}) {
+    let layout;
+    if (fileSize % 2352 === 0) {
+      const s = await read(16 * 2352, 2352);
+      if (SYNC.every((v, i) => s[i] === v)) layout = { size: 2352, raw: true };
+    }
+    if (!layout && fileSize % 2048 === 0) layout = { size: 2048, raw: false };
+    if (!layout) throw new Error('Unrecognised image format. Use a raw 2352-byte .bin (track 1) or a 2048-byte .iso.');
+    log(`Image: ${layout.raw ? 'raw 2352-byte sectors (BIN)' : '2048-byte sectors (ISO)'}`, 'info');
+
+    const dataOff = (raw) => (raw[15] === 1 ? 16 : 24);
+    const sector = async (lba) => {
+      const raw = await read(lba * layout.size, layout.size);
+      return { raw, data: layout.raw ? raw.subarray(dataOff(raw), dataOff(raw) + 2048) : raw };
+    };
+    const pvd = (await sector(16)).data;
+    if (String.fromCharCode(...pvd.subarray(1, 6)) !== 'CD001') throw new Error('No ISO 9660 file system found — is this the data track?');
+    log(`Volume: ${String.fromCharCode(...pvd.subarray(40, 72)).trim() || '(unnamed)'}`);
+    const pv = new DataView(pvd.buffer, pvd.byteOffset);
+    const rootLba = pv.getUint32(158, true), rootLen = pv.getUint32(166, true);
+
+    // walk the root directory
+    const entries = [];
+    for (let s = 0; s < Math.ceil(rootLen / 2048); s++) {
+      const d = (await sector(rootLba + s)).data;
+      for (let i = 0; i < 2048;) {
+        const len = d[i]; if (!len) break;
+        const v = new DataView(d.buffer, d.byteOffset + i);
+        const nameLen = d[i + 32];
+        const name = nameLen === 1 && d[i + 33] < 2 ? null : String.fromCharCode(...d.subarray(i + 33, i + 33 + nameLen)).toUpperCase().split(';')[0];
+        entries.push({ name, lba: v.getUint32(2, true), size: v.getUint32(10, true), rec: d.slice(i, i + len) });
+        i += len;
+      }
+    }
+    const exeEnt = entries.find((e) => e.name === EXE_NAME);
+    if (!exeEnt) throw new Error(`${EXE_NAME} not found on this disc — this patch is for the USA “Making of Lunar” disc.`);
+    if (exeEnt.size !== EXE_SIZE) throw new Error(`${EXE_NAME} has an unexpected size (${exeEnt.size} bytes).`);
+    log(`Found ${EXE_NAME} at sector ${exeEnt.lba}`);
+
+    const sectors = [];
+    const exe = new Uint8Array(EXE_SECTORS * 2048);
+    for (let i = 0; i < EXE_SECTORS; i++) { const s = await sector(exeEnt.lba + i); sectors.push(s); exe.set(s.data, i * 2048); }
+    const orig = exe.slice();
+    const base = exe.slice();
+    revert(base);
+    const crc = crc32(base.subarray(0, EXE_SIZE));
+    if (crc !== CRC_ORIG) throw new Error(`Executable doesn’t match the expected version (CRC32 ${crc.toString(16).toUpperCase().padStart(8, '0')}).`);
+    log(crc32(orig.subarray(0, EXE_SIZE)) === CRC_ORIG ? 'Executable matches the original (CRC32 21F12BE5).' : 'Previously patched executable detected — re-patching with the new options.', 'ok');
+
+    if (opt.mode !== 'game') {
+      const out = base.slice();
+      apply(out, opt, false);
+      if (opt.startOnly) log('START alone unlocks the game during the video.', 'info');
+      const writes = [];
+      for (let i = 0; i < EXE_SECTORS; i++) {
+        const a = orig.subarray(i * 2048, i * 2048 + 2048), b = out.subarray(i * 2048, i * 2048 + 2048);
+        let diff = false; for (let k = 0; k < 2048; k++) if (a[k] !== b[k]) { diff = true; break; }
+        if (!diff) continue;
+        const lba = exeEnt.lba + i;
+        if (layout.raw) {
+          const sec = sectors[i].raw.slice();
+          sec.set(b, dataOff(sec));
+          fixSector(sec);
+          writes.push({ offset: lba * 2352, bytes: sec });
+        } else {
+          writes.push({ offset: lba * 2048, bytes: b.slice() });
+        }
+      }
+      log(writes.length ? `${writes.length} sector${writes.length === 1 ? '' : 's'} rewritten${layout.raw ? ' (EDC/ECC regenerated)' : ''}.` : 'Image already has exactly these options — nothing to change.', 'ok');
+      return { kind: 'writes', writes };
+    }
+
+    // ---- standalone "Lords of Lunar only" image
+    const cnfEnt = entries.find((e) => e.name === 'SYSTEM.CNF');
+    const self = entries.find((e) => e.name === null);
+    if (!cnfEnt || rootLen !== 2048 || rootLba >= 24 || cnfEnt.lba >= 24 || cnfEnt.size > 2048)
+      throw new Error('Unexpected disc layout — can’t build the standalone image.');
+    const exeLba = 24, PAD = 150;
+    const total = exeLba + EXE_SECTORS + PAD;
+    const S = layout.size;
+    const img = new Uint8Array(total * S);
+    for (let l = 0; l < 24; l++) img.set((await sector(l)).raw, l * S);
+    const dataView = (l) => layout.raw ? img.subarray(l * S + dataOff(img.subarray(l * S)), l * S + dataOff(img.subarray(l * S)) + 2048) : img.subarray(l * S, l * S + 2048);
+    // PVD: volume size
+    { const d = dataView(16), v = new DataView(d.buffer, d.byteOffset); v.setUint32(80, total, true); v.setUint32(84, total, false); }
+    // root directory: ".", "..", SLUS_009.21 (moved to sector 24), SYSTEM.CNF
+    {
+      const d = dataView(rootLba); d.fill(0);
+      let p = 0;
+      for (const e of entries.filter((x) => x.name === null || x.name === EXE_NAME || x.name === 'SYSTEM.CNF')) {
+        const r = e.rec.slice();
+        if (e.name === EXE_NAME) { const v = new DataView(r.buffer); v.setUint32(2, exeLba, true); v.setUint32(6, exeLba, false); }
+        d.set(r, p); p += r.length;
+      }
+    }
+    // executable
+    const out = base.slice();
+    apply(out, opt, true);
+    for (let i = 0; i < EXE_SECTORS; i++) {
+      const l = exeLba + i;
+      if (layout.raw) {
+        const sec = sectors[i].raw.slice();
+        setMsf(sec, l);
+        sec.set(out.subarray(i * 2048, i * 2048 + 2048), dataOff(sec));
+        img.set(sec, l * S);
+      } else img.set(out.subarray(i * 2048, i * 2048 + 2048), l * S);
+    }
+    // padding (empty form-1 data sectors)
+    if (layout.raw) for (let l = exeLba + EXE_SECTORS; l < total; l++) {
+      const sec = img.subarray(l * S, l * S + S);
+      sec.set(SYNC, 0); setMsf(sec, l); sec[15] = 2; sec[18] = 0x08; sec[22] = 0x08;
+    }
+    if (layout.raw) for (let l = 0; l < total; l++) {      // regenerate EDC/ECC on every form-1 sector
+      const sec = img.subarray(l * S, l * S + S);
+      if (!(sec[15] === 2 && (sec[18] & 0x20))) fixSector(sec);
+    }
+    log(`Standalone image: ${total} sectors (${(img.length / 1048576).toFixed(2)} MB), boots straight into Lords of Lunar.`, 'ok');
+    const ext = layout.raw ? 'bin' : 'iso';
+    const cue = layout.raw ? `FILE "${GAME_NAME}.bin" BINARY\r\n  TRACK 01 MODE2/2352\r\n    INDEX 01 00:00:00\r\n` : null;
+    return { kind: 'image', bytes: img, ext, name: GAME_NAME, cue };
+  }
+  return { patch, crc32, fixSector, edc };
+})();
+if (typeof module !== 'undefined') module.exports = LunarPatcher;
+/*@@CORE_END*/
+
+// ---------------- UI ----------------
+(() => {
+  if (typeof document === 'undefined') return;
+  const $ = (id) => document.getElementById(id);
+  const drop = $('drop'), input = $('file'), logEl = $('log'), dl = $('dl'), dlcue = $('dlcue');
+  let current = null, result = null, run = 0;
+  const mode = () => document.querySelector('input[name="mode"]:checked').value;
+  function syncOptions() {
+    const game = mode() === 'game';
+    $('startOnly').disabled = game;
+    $('startOpt').classList.toggle('disabled', game);
+  }
+  function log(msg, cls) {
+    const line = document.createElement('div');
+    if (cls) line.className = cls;
+    line.textContent = msg;
+    logEl.appendChild(line);
+  }
+  async function handle(file) {
+    if (!file) return;
+    current = file;
+    const me = ++run;
+    logEl.textContent = ''; dl.disabled = true; dlcue.hidden = true; result = null;
+    log(`File: ${file.name} (${(file.size / 1048576).toFixed(1)} MB)`);
+    if (/\.(cue|chd)$/i.test(file.name)) { log('Please drop the .bin itself (for a CHD, run chdman extractcd first).', 'bad'); return; }
+    const read = async (off, len) => new Uint8Array(await file.slice(off, off + len).arrayBuffer());
+    const opt = { gain: parseInt($('gain').value, 10), dial: parseInt($('dial').value, 10), startOnly: $('startOnly').checked, mode: mode() };
+    try {
+      const r = await LunarPatcher.patch(read, file.size, opt, log);
+      if (me !== run) return;
+      if (r.kind === 'writes') {
+        const writes = r.writes.sort((a, b) => a.offset - b.offset);
+        const parts = []; let pos = 0;
+        for (const w of writes) { parts.push(file.slice(pos, w.offset), w.bytes); pos = w.offset + w.bytes.length; }
+        parts.push(file.slice(pos));
+        const dot = file.name.lastIndexOf('.');
+        const name = dot > 0 ? `${file.name.slice(0, dot)} (Paddle Patch)${file.name.slice(dot)}` : `${file.name} (Paddle Patch)`;
+        result = { blob: new Blob(parts, { type: 'application/octet-stream' }), name };
+        dl.textContent = 'Download patched image';
+      } else {
+        result = { blob: new Blob([r.bytes], { type: 'application/octet-stream' }), name: `${r.name}.${r.ext}` };
+        if (r.cue) { result.cue = new Blob([r.cue], { type: 'text/plain' }); result.cueName = `${r.name}.cue`; dlcue.hidden = false; }
+        dl.textContent = `Download ${r.name}.${r.ext}`;
+      }
+      log(`Ready: ${result.name}${result.cue ? ' + ' + result.cueName : ''}`, 'ok');
+      dl.disabled = false;
+    } catch (e) {
+      log(e.message, 'bad');
+    }
+  }
+  function save(blob, name) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
+  drop.addEventListener('click', () => input.click());
+  drop.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); } });
+  input.addEventListener('change', () => handle(input.files[0]));
+  ['dragenter', 'dragover'].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('hover'); }));
+  ['dragleave', 'drop'].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('hover'); }));
+  drop.addEventListener('drop', (e) => handle(e.dataTransfer.files[0]));
+  window.addEventListener('dragover', (e) => e.preventDefault());
+  window.addEventListener('drop', (e) => e.preventDefault());
+  document.querySelectorAll('input[name="mode"], #startOnly, #gain, #dial').forEach((el) => el.addEventListener('change', () => { syncOptions(); if (current) handle(current); }));
+  syncOptions();
+  dl.addEventListener('click', () => { if (result) save(result.blob, result.name); });
+  dlcue.addEventListener('click', () => { if (result && result.cue) save(result.cue, result.cueName); });
+})();
+</script>
+</body>
+</html>
